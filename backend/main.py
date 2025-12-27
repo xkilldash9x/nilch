@@ -3,7 +3,7 @@ import json
 import re
 from flask import Flask, jsonify, request, render_template, send_file
 
-BRAVE_SEARCH_API_KEYS = ["BSAbOFQKBdrURDAUD9O9VGGGk_hJXiW", "BSAXCzhyTfO6kE_wq3XQUprRnkdGRS6"]
+BRAVE_SEARCH_API_KEYS = [] # Add your keys (can have multiple)
 
 BRAVE_SEARCH_API_HEADERS = {
     "Accept": "application/json",
