@@ -449,6 +449,13 @@
                     snippetDiv.className = 'result-snippet';
                     snippetDiv.innerHTML = searchResults[result].description;
                     
+                    if (searchResults[result].page_age) {
+                        const dateDiv = document.createElement('div');
+                        dateDiv.className = 'result-date';
+                        dateDiv.textContent = "PUBLISHED " + searchResults[result].page_age.split("T")[0];
+                        resultDiv.appendChild(dateDiv);
+                    }
+
                     // And append
                     resultDiv.appendChild(titleDiv);
                     resultDiv.appendChild(urlDiv);
