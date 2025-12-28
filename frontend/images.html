@@ -315,10 +315,10 @@
         (async function() {
             try {
                 const response = await getUrlContents("https://unmappedstack.pythonanywhere.com/api/images?q=" + encodedQuery);
-                if (resultsResponse == "noquery") {
+                if (response == "noquery") {
                     document.getElementById("results").innerHTML = '<p>There was an error, please try again: noquery</p>';
                     return;
-                } else if (resultsResponse == "noresults") {
+                } else if (response == "noresults") {
                     document.getElementById("results").innerHTML = '<p>There was an error, please try again: noresults</p>';
                     return;
                 }

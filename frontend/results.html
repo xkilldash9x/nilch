@@ -265,6 +265,21 @@
             color: #6b7280;
             font-size: 0.875rem;
             margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .result-favicon {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+        }
+        
+        .result-date {
+            color: #6b7280;
+            font-size: 0.8125rem;
+            margin-bottom: 4px;
         }
         
         .result-snippet {
@@ -415,10 +430,19 @@
                     link.textContent = searchResults[result].title;
                     titleDiv.appendChild(link);
                     
-                    // Construct URL
                     const urlDiv = document.createElement('div');
                     urlDiv.className = 'result-url';
-                    urlDiv.textContent = searchResults[result].url;
+                    
+                    // Favicon
+                    const favicon = document.createElement('img');
+                    favicon.className = 'result-favicon';
+                    favicon.src = searchResults[result].profile.img;
+                    urlDiv.appendChild(favicon);
+                    
+                    // URL
+                    const urlText = document.createElement('span');
+                    urlText.textContent = searchResults[result].url;
+                    urlDiv.appendChild(urlText);
                     
                     // Construct description
                     const snippetDiv = document.createElement('div');
