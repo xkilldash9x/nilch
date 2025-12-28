@@ -219,6 +219,35 @@
             color: #374151;
         }
 
+        .safe-container {
+            margin-bottom: 16px;
+        }
+        
+        .safe-toggle {
+            padding: 6px 12px;
+            border: 2px solid #4c1d95;
+            border-radius: 6px;
+            background-color: transparent;
+            color: #a78bfa;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        
+        .safe-toggle:hover {
+            background-color: #2a2a2a;
+            border-color: #7c3aed;
+        }
+        
+        body.light-mode .safe-toggle {
+            border-color: #7c3aed;
+            color: #7c3aed;
+        }
+        
+        body.light-mode .safe-toggle:hover {
+            background-color: #f3f4f6;
+        }
+
         @media (max-width: 768px) {
             .theme-toggle {
                 display: none;
@@ -250,6 +279,10 @@
             <a href="#" class="tab active">Images</a>
         </div>
         
+        <div class="safe-container">
+            <button class="safe-toggle" onclick="toggleSafeSearch()">Safe Search: On</button>
+        </div>
+
         <div class="image-grid" id="results">
             <!--<div class="image-item">
                 <a href="#">
@@ -263,6 +296,7 @@
 
     <script>
         const urlParams = new URLSearchParams(window.location.search);
+        const safeSearch = urlParams.get('safe') || "strict";
         const query = urlParams.get('q');
         const encodedQuery = encodeURIComponent(query);
         const results = document.getElementById("results");
@@ -314,7 +348,9 @@
         // Wrap async code in IIFE
         (async function() {
             try {
-                const response = await getUrlContents("https://unmappedstack.pythonanywhere.com/api/images?q=" + encodedQuery);
+                const url = "https://unmappedstack.pythonanywhere.com/api/images?q=" + encodedQuery
+                                + "&safe=" + safeSearch;
+                const response = await getUrlContents(url);
                 if (response == "noquery") {
                     document.getElementById("results").innerHTML = '<p>There was an error, please try again: noquery</p>';
                     return;
@@ -359,6 +395,22 @@
             document.getElementById('searchInput').value = query;
             document.getElementById('webTab').href = 'results.html?q=' + encodeURIComponent(query);
         }
+        
+        function toggleSafeSearch() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const current = urlParams.get('safe') || 'strict';
+            const newValue = current === 'strict' ? 'off' : 'strict';
+            urlParams.set('safe', newValue);
+            window.location.href = window.location.pathname + '?' + urlParams.toString();
+        }
+        
+        (function updateSafeButton() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const safeButton = document.querySelector('.safe-toggle');
+            if (!safeButton) return;
+            const safeStatus = urlParams.get('safe') || 'strict';
+            safeButton.textContent = 'Safe Search: ' + (safeStatus === 'strict' ? 'On' : 'Off');
+        })();
     </script>
 </body>
 </html>

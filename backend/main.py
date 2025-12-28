@@ -26,17 +26,17 @@ def make_brave_request(url, params):
         except RateLimitError:
             continue
 
-def get_web_results(query: str):
+def get_web_results(query: str, safe_search: str):
     url = "https://api.search.brave.com/res/v1/web/search"
-    params = { "q": query }
+    params = { "q": query, "safesearch": safe_search }
     response = make_brave_request(url, params)
     if response != None and response.status_code == 200:
         return response.json()["web"]["results"]
     return None
 
-def get_img_results(query: str):
+def get_img_results(query: str, safe_search: str):
     url = "https://api.search.brave.com/res/v1/images/search"
-    params = { "q": query }
+    params = { "q": query, "safesearch" : safe_search }
     response = make_brave_request(url, params)
     if response != None and response.status_code == 200:
         results = response.json()["results"]
@@ -108,9 +108,12 @@ app = Flask(__name__)
 @app.route("/api/search")
 def results():
     query = request.args.get("q")
+    safe_search = request.args.get("safe")
     if (query == None):
         return "noquery"
-    results = get_web_results(query)
+    if (safe_search == None):
+        safe_search = "strict"
+    results = get_web_results(query, safe_search)
     if (results == None):
         return "noresults"
     infobox = get_infobox(results, query)
@@ -123,9 +126,12 @@ def results():
 @app.route("/api/images")
 def images():
     query = request.args.get("q")
+    safe_search = request.args.get("safe")
     if (query == None):
         return "noquery"
-    results = get_img_results(query)
+    if (safe_search == None):
+        safe_search = "strict"
+    results = get_img_results(query, safe_search)
     if (results == None):
         return "noresults"
     return results
