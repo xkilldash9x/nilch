@@ -403,6 +403,63 @@
         .light-mode [type="search"]::-webkit-search-cancel-button {
             background-color: #000000;
         }
+
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 40px;
+            margin-bottom: 60px;
+            width: 100%;
+            overflow-x: visible;
+        }
+        
+        .pagination {
+            display: flex;
+            flex-wrap: wrap;      /* ⬅ ENABLE WRAPPING */
+            justify-content: center;
+            gap: 8px;
+            row-gap: 14px;
+            list-style: none;
+            max-width: 100%;
+            padding: 0 10px;      /* little side breathing room */
+        }
+        
+        .page-btn {
+            padding: 8px 14px;
+            border: 2px solid #4c1d95;
+            border-radius: 6px;
+            color: #a78bfa;
+            text-decoration: none;
+            font-size: 0.9rem;
+            white-space: nowrap;  /* prevents numbers from breaking */
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        
+        .page-btn:hover {
+            background-color: #2a2a2a;
+            border-color: #7c3aed;
+        }
+        
+        .page-btn.active {
+            background-color: #4c1d95;
+            border-color: #7c3aed;
+            color: white;
+        }
+        
+        /* Light mode support */
+        body.light-mode .page-btn {
+            border-color: #7c3aed;
+            color: #7c3aed;
+        }
+        
+        body.light-mode .page-btn:hover {
+            background-color: #f3f4f6;
+        }
+        
+        body.light-mode .page-btn.active {
+            background-color: #7c3aed;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -438,6 +495,7 @@
         const safeSearch = urlParams.get('safe') || "strict";
         const query = urlParams.get('q');
         const encodedQuery = encodeURIComponent(query);
+        const page = parseInt(urlParams.get('page') || "0");
         
         async function getUrlContents(url) {
             const proxyUrl = 'https://api.codetabs.com/v1/proxy?quest=';
@@ -496,11 +554,33 @@
             return false;
         }
         
+        function createPagination(totalPages = 9, currentPage = page) {
+            const container = document.createElement("div");
+            container.className = "pagination-container";
+            const list = document.createElement("ul");
+            list.className = "pagination";
+            for (let i = 0; i <= totalPages; i++) {
+                const li = document.createElement("li");
+                const a = document.createElement("a");
+                a.href = window.location.href + "&page=" + i;
+                a.textContent = i + 1;
+                a.className = "page-btn";
+                if (i === currentPage) {
+                    a.classList.add("active");
+                }
+                li.appendChild(a);
+                list.appendChild(li);
+            }
+            container.appendChild(list);
+            const results = document.getElementById("videoResults");
+            results.insertAdjacentElement("afterend", container);
+        }
+
         // Wrap all async code in an IIFE
         (async function() {
             try {
                 const url = "https://unmappedstack.pythonanywhere.com/api/search?videos=true&q=" + encodedQuery
-                                + "&safe=" + safeSearch;
+                                + "&safe=" + safeSearch + "&page=" + page;
                 const resultsResponse = await getUrlContents(url);
                 if (resultsResponse == "noquery") {
                     document.getElementById("results").innerHTML = '<p>There was an error, please try again: noquery</p>';
@@ -556,6 +636,7 @@
                 
                     container.appendChild(card);
                 });
+                createPagination();
             } catch (error) {
                 console.error('Error loading search results:', error);
                 document.getElementById("results").innerHTML = '<p>Error loading search results. Please try again.<br>' + error + '</p>';
